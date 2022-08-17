@@ -1,6 +1,8 @@
 package com.hhyhhy.ledger.model
 
+import org.ktorm.database.Database
 import org.ktorm.entity.Entity
+import org.ktorm.entity.sequenceOf
 import org.ktorm.schema.Table
 import org.ktorm.schema.long
 import org.ktorm.schema.text
@@ -18,3 +20,5 @@ interface User : Entity<User> {
 
     var name: String
 }
+
+val Database.users get() = sequenceOf(Users)

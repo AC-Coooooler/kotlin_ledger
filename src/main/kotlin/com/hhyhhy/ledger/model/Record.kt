@@ -1,6 +1,8 @@
 package com.hhyhhy.ledger.model
 
+import org.ktorm.database.Database
 import org.ktorm.entity.Entity
+import org.ktorm.entity.sequenceOf
 import org.ktorm.schema.*
 import java.time.LocalDate
 
@@ -37,3 +39,5 @@ interface Record : Entity<Record> {
 
     var consumerIds: LongArray
 }
+
+val Database.records get() = sequenceOf(Records)
