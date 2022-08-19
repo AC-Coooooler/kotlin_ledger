@@ -1,24 +1,18 @@
 package com.hhyhhy.ledger.model
 
-import org.ktorm.database.Database
-import org.ktorm.entity.Entity
-import org.ktorm.entity.sequenceOf
-import org.ktorm.schema.Table
-import org.ktorm.schema.long
-import org.ktorm.schema.text
+import org.bson.types.ObjectId
+import org.springframework.data.mongodb.core.mapping.Document
+import java.time.LocalDate
 
-object Bills : Table<Bill>("bills") {
-    val id = long("id").primaryKey().bindTo { it.id }
+@Document
+data class Bill(val id: ObjectId = ObjectId.get(), var name: String, var records: List<Record> = listOf())
 
-    val name = text("name").bindTo { it.name }
-}
-
-interface Bill : Entity<Bill> {
-    companion object : Entity.Factory<Bill>()
-
-    val id: Long
-
-    var name: String
-}
-
-val Database.bills get() = sequenceOf(Bills)
+data class Record(
+    val id: ObjectId = ObjectId.get(),
+    val name: String,
+    val date: LocalDate,
+    val expense: Boolean,
+    val amountFen: Int,
+    val creatorId: ObjectId,
+    val consumerIds: List<ObjectId>
+)
