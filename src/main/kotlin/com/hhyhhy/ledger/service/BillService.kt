@@ -17,18 +17,14 @@ import java.time.format.DateTimeFormatter
 
 @Service
 class BillService @Autowired constructor(val billRepository: BillRepository, val userRepository: UserRepository) {
-    fun allThin(): List<BillThinDTO> {
-        return billRepository.findAllThin().map { BillThinDTO(it) }
-    }
+    fun allThin() = billRepository.findAllThin().map { BillThinDTO(it) }
+
+    fun pushRecord(id: String, record: Record) = billRepository.pushRecord(id, record)
 
     fun create(name: String): String {
         val bill = Bill(name = name)
         billRepository.save(bill)
         return bill.id.toHexString()
-    }
-
-    fun pushRecord(id: String, record: Record) {
-        billRepository.pushRecord(id, record)
     }
 
     private fun getUserDTOById(cache: HashMap<String, User?>, id: ObjectId): UserDTO {
