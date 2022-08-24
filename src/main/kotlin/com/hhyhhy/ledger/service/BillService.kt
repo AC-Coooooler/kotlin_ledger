@@ -1,19 +1,17 @@
 package com.hhyhhy.ledger.service
 
 import com.hhyhhy.ledger.model.Bill
-import com.hhyhhy.ledger.pojo.BillThinDTO
-import com.hhyhhy.ledger.repository.BillRepository
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Service
 import com.hhyhhy.ledger.model.Record
-import com.hhyhhy.ledger.model.User
 import com.hhyhhy.ledger.pojo.BillDTO
+import com.hhyhhy.ledger.pojo.BillThinDTO
 import com.hhyhhy.ledger.pojo.RecordDTO
 import com.hhyhhy.ledger.pojo.UserDTO
+import com.hhyhhy.ledger.repository.BillRepository
 import com.hhyhhy.ledger.repository.UserRepository
 import com.hhyhhy.ledger.unwrap
 import org.bson.types.ObjectId
-import java.time.format.DateTimeFormatter
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 
 @Service
 class BillService @Autowired constructor(val billRepository: BillRepository, val userRepository: UserRepository) {
@@ -27,18 +25,16 @@ class BillService @Autowired constructor(val billRepository: BillRepository, val
         return bill.id.toHexString()
     }
 
-    private fun getUserDTOById(cache: HashMap<String, User?>, id: ObjectId): UserDTO {
-        val user = cache.getOrPut(id.toHexString()) {
-            userRepository.findById(id.toHexString()).unwrap()
+    private fun getUserDTOById(cache: MutableMap<String, UserDTO>, id: ObjectId): UserDTO {
+        return cache.getOrPut(id.toHexString()) {
+            val user = userRepository.findById(id.toHexString()).unwrap()
+            if (user != null) UserDTO(user) else UserDTO(id.toHexString())
         }
-
-        return if (user != null) UserDTO(user) else UserDTO(id.toHexString())
     }
 
     fun findById(id: String): BillDTO? {
         val bill = billRepository.findById(id).unwrap() ?: return null
-        val userCache = HashMap<String, User?>()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val userCache = mutableMapOf<String, UserDTO>()
         val records = mutableListOf<RecordDTO>()
 
         for (record in bill.records) {
@@ -50,15 +46,7 @@ class BillService @Autowired constructor(val billRepository: BillRepository, val
                 consumers.add(consumer)
             }
 
-            val recordDTO = RecordDTO(
-                id = record.id.toHexString(),
-                name = record.name,
-                date = record.date.format(formatter),
-                expense = record.expense,
-                amountFen = record.amountFen,
-                creator = creatorDTO,
-                consumers = consumers
-            )
+            val recordDTO = RecordDTO(record, creatorDTO, consumers)
             records.add(recordDTO)
         }
 
