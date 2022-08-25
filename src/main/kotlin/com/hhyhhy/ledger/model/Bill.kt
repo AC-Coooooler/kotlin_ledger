@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDate
 
 @Document
-data class Bill(val id: ObjectId = ObjectId.get(), var name: String, var records: List<Record> = listOf())
+data class Bill(val id: ObjectId = ObjectId.get(), var name: String, var records: List<Record> = emptyList())
 
 data class Record(
     val id: ObjectId = ObjectId.get(),
